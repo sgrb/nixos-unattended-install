@@ -12,12 +12,10 @@ let
 in
 {
   options.uinstall = {
-    target = {
-      configuration = mkOption {
-        type = types.str;
-        default = "target";
-        description = "Target system configuration name";
-      };
+    namePrefix = mkOption {
+      type = types.str;
+      default = "installer-";
+      description = "Installer iso package prefix name";
     };
 
     installer = {
@@ -41,32 +39,27 @@ in
     };
   };
 
-  config = let
-    targetConf = self.outputs.nixosConfigurations.${cfg.target.configuration};
-    installerConf = nixosSystem {
-      inherit (targetConf.pkgs.stdenv.hostPlatform) system;
-      modules = [
-        ../installer.nix
-        inputs.disko.nixosModules.default
-        cfg.installer.configuration
-      ];
-      specialArgs = {
-        installerCfg = cfg;
-        nixosSystem = targetConf;
-        flake = self;
-      };
-    };
-  in {
-    flake.nixosConfigurations.installer = installerConf;
-    perSystem = { pkgs, system, ... }:
-      let
-        iso = installerConf.config.system.build.isoImage;
-      in
-        {
-          packages = {
-            inherit iso;
-            default = iso;
+  config = {
+    perSystem = {
+        packages = lib.mapAttrs' (name: targetConf: let
+          installerConf = nixosSystem {
+            inherit (targetConf.pkgs.stdenv.hostPlatform) system;
+            modules = [
+              ../installer.nix
+              inputs.disko.nixosModules.default
+              cfg.installer.configuration
+            ];
+            specialArgs = {
+              installerCfg = cfg;
+              nixosSystem = targetConf;
+              flake = self;
+              cfgName = name;
+            };
           };
-        };
+        in lib.nameValuePair
+          "${cfg.namePrefix}${name}"
+          installerConf.config.system.build.isoImage
+        ) self.outputs.nixosConfigurations;
+    };
   };
 }

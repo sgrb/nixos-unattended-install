@@ -6,6 +6,7 @@
   installerCfg,
   nixosSystem,
   flake,
+  cfgName,
   ...
 }:
 {
@@ -15,7 +16,7 @@
 
   config = let
     cfg = installerCfg;
-    flakeConf = "${flake}#${cfg.target.configuration}";
+    flakeConf = "${flake}#${cfgName}";
     recFlattenInputs = inputs:
       builtins.foldl' (acc: input:
         let
