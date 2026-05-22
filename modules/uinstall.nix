@@ -18,24 +18,28 @@ in
       description = "Installer iso package prefix name";
     };
 
-    installer = {
-      configuration = mkOption {
-        type = types.anything;
-        default = { };
-        description = "Installer system configuration overrides";
-      };
+    configuration = mkOption {
+      type = types.anything;
+      default = { };
+      description = "Installer system configuration overrides";
+    };
 
-      buildOnRemote = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Don't pre-build target system";
-      };
+    buildOnRemote = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Don't pre-build target system";
+    };
 
-      wifiNetworks = mkOption {
-        type = types.listOf types.anything;
-        default = [ ];
-        description = "WiFi networks for the installer";
-      };
+    confirm = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Ask confirmation for destroying disk";
+    };
+
+    diskName = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "Disk name im disko configuration";
     };
   };
 
@@ -47,7 +51,7 @@ in
             modules = [
               ../installer.nix
               inputs.disko.nixosModules.default
-              cfg.installer.configuration
+              cfg.configuration
             ];
             specialArgs = {
               installerCfg = cfg;
