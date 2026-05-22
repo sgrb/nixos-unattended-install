@@ -14,12 +14,12 @@
       systems = [ "x86_64-linux" ];
       flake = {
         flakeModules.default = ./modules/uinstall.nix;
-        nixosModules.standardDisko = ./modules/standardDisko.nix;
+        nixosModules.simpleDisko = ./modules/simpleDisko.nix;
         nixosConfigurations.target = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
             inputs.disko.nixosModules.default
-            ./modules/standardDisko.nix
+            ./modules/simpleDisko.nix
             {
               users.users.root.password = "test";
             }
