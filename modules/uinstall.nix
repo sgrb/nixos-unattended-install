@@ -1,4 +1,7 @@
 {
+  disko
+}:
+{
   self,
   config,
   lib,
@@ -50,7 +53,7 @@ in
             inherit (targetConf.pkgs.stdenv.hostPlatform) system;
             modules = [
               ../installer.nix
-              inputs.disko.nixosModules.default
+              disko.nixosModules.default
               cfg.configuration
             ];
             specialArgs = {

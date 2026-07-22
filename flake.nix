@@ -8,12 +8,14 @@
     disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs @ { flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [ ./modules/uinstall.nix ];
+  outputs = inputs @ { flake-parts, disko, ... }:
+  let
+    uinstall = import ./modules/uinstall.nix {inherit disko;};
+  in flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ uinstall ];
       systems = [ "x86_64-linux" ];
       flake = {
-        flakeModules.default = ./modules/uinstall.nix;
+        flakeModules.default = uinstall;
         nixosModules.simpleDisko = ./modules/simpleDisko.nix;
         nixosConfigurations.target = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
